@@ -1,19 +1,12 @@
-const express = require('express');
-const cors = require('cors');
-const { Resend } = require('resend');
-require('dotenv').config();
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 app.post('/send-email', async (req, res) => {
   const { name, email, phone, type, message } = req.body;
 
+  console.log('Petición recibida:', { name, email, phone, type });
+  console.log('RESEND_API_KEY:', process.env.RESEND_API_KEY ? 'OK' : 'NO DEFINIDA');
+  console.log('AUDIT_RECIPIENT_EMAIL:', process.env.AUDIT_RECIPIENT_EMAIL || 'NO DEFINIDA');
+
   try {
-    await resend.emails.send({
+    const response = await resend.emails.send({
       from: 'onboarding@resend.dev',
       to: process.env.AUDIT_RECIPIENT_EMAIL,
       subject: `Nueva solicitud de asociación de ${name}`,
@@ -26,11 +19,10 @@ app.post('/send-email', async (req, res) => {
         <p><b>Mensaje:</b> ${message || 'No proporcionado'}</p>
       `
     });
+    console.log('Respuesta de Resend:', response);
     res.json({ success: true });
   } catch (error) {
+    console.error('Error al enviar:', error);
     res.status(500).json({ error: error.message });
   }
 });
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
