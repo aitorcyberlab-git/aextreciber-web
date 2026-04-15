@@ -23,7 +23,7 @@ export default function JoinSection() {
     setLoading(true);
 
     try {
-      const res = await fetch('https://aextreciber-backend.onrender.com', {
+      const res = await fetch('https://aextreciber-backend.onrender.com/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
