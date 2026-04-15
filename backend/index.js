@@ -15,7 +15,7 @@ app.post('/send-email', async (req, res) => {
   try {
     await resend.emails.send({
       from: 'onboarding@resend.dev',
-      to: process.env.EMAIL_TO,
+      to: process.env.AUDIT_RECIPIENT_EMAIL,
       subject: `Nueva solicitud de asociación de ${name}`,
       html: `
         <h2>Nueva solicitud de asociación - AEXTRECIBER</h2>
