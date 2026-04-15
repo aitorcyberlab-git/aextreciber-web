@@ -1,3 +1,14 @@
+const express = require('express');
+const cors = require('cors');
+const { Resend } = require('resend');
+require('dotenv').config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 app.post('/send-email', async (req, res) => {
   const { name, email, phone, type, message } = req.body;
 
@@ -26,3 +37,6 @@ app.post('/send-email', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
