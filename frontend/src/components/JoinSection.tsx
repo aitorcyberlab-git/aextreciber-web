@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function JoinSection() {
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,13 +18,41 @@ export default function JoinSection() {
     message: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: '¡Solicitud enviada!',
-      description: 'Nos pondremos en contacto contigo pronto para completar tu asociación.',
-    });
-    setFormData({ name: '', email: '', phone: '', type: '', message: '' });
+    setLoading(true);
+
+    try {
+      const res = await fetch('https://tu-backend.onrender.com/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast({
+          title: '¡Solicitud enviada!',
+          description: 'Nos pondremos en contacto contigo pronto para completar tu asociación.',
+        });
+        setFormData({ name: '', email: '', phone: '', type: '', message: '' });
+      } else {
+        toast({
+          title: 'Error al enviar',
+          description: 'Hubo un problema al enviar tu solicitud. Inténtalo de nuevo.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Error de conexión',
+        description: 'No se pudo conectar con el servidor. Inténtalo más tarde.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -106,8 +135,8 @@ export default function JoinSection() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 h-12 text-lg">
-                  Enviar Solicitud
+                <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 h-12 text-lg">
+                  {loading ? 'Enviando...' : 'Enviar Solicitud'}
                   <UserPlus className="ml-2 w-5 h-5" />
                 </Button>
               </form>
